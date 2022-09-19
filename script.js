@@ -1,55 +1,63 @@
-console.log("Hello")
 
-const timeTag = document.querySelector(".timer__time")
-const startBtn = document.querySelector(".timer__start")
-const pauseBtn = document.querySelector(".timer__pause")
-const resetBtn = document.querySelector(".timer__reset")
+const lengthTag = document.querySelector("#length")
+const letterTag = document.querySelector("#letters__yes")
+const numberTag = document.querySelector("#numbers")
+const symbolTag = document.querySelector("#symbols")
+const generateBtn = document.querySelector(".generator__generate")
+const passwordTag = document.querySelector(".generator__password")
+const errorTag = document.querySelector(".generator__error")
+const copyBtn = document.querySelector(".generator__copy")
 
-let runTimer = null
-let ss = 0
-let mm = 0
-let hh = 0
 
- const zeroAdder = (num) => {
-    if (num < 10) {
-       return `0${num}`
-    } else{
-        return num
-    }
- }
- const  showTime = () => {
 
-    timeTag.innerText = `${zeroAdder(hh)}:${zeroAdder(mm)}:${zeroAdder(ss)}`
+const randomizer = (max) => {
+    let  rand =   Math.random()  * max ;
+    return Math.floor(rand)
+}
 
-};
+let result = ""
+generateBtn.addEventListener("click",() => {
+    passwordTag.innerText = ""
+    result = ""
+    copyBtn.style.display = "none"
 
-startBtn.addEventListener("click",() => {
-    if (runTimer === null) {
-        runTimer = setInterval(() => {
-            ss++
-            if (ss === 60) {
-                ss = 0
-                mm++
+    if (lengthTag.value  && +lengthTag.value > 7  && +lengthTag.value < 128 ) {
+        const length = +lengthTag.value
+        const isLettersChecked = letterTag.checked
+        const isNumbersChecked = numberTag.checked
+        const isSymbolsChecked = symbolTag.checked
+
+        const symbolsString = "!\"#$%&\'()*+,-./:;<=>?{}~'"
+        const numbersString = "0123456789"
+        const lettersString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+        let symbolsForUse = ""
+
+        symbolsForUse = (isNumbersChecked ? numbersString : "")
+            + (isSymbolsChecked ? symbolsString : "")
+            + (isLettersChecked ? lettersString : "")
+
+        if (symbolsForUse) {
+            let result = ""
+            for (let i = 0; i < length; i++) {
+                const random = randomizer(symbolsForUse.length)
+                result = `${result}${symbolsForUse[random]}`
             }
-            if (mm === 60) {
-                mm = 0
-                hh++
-            }
-            showTime()
-        }, 1000)
+            passwordTag.innerText = result
+            lengthTag.style.border = "1px solid #000"
+            errorTag.innerText = ""
+            copyBtn.style.display = "inline"
+
+        } else {
+            errorTag.innerText = "You should select something"
+        }
+
+
+    } else {
+        lengthTag.style.border = "1px solid brown"
+        errorTag.innerText = "Please check input length"
     }
 })
-
-pauseBtn.addEventListener("click",() =>{
-    clearInterval(runTimer)
-    runTimer = null
-})
-
-resetBtn.addEventListener("click",() =>{
-    clearInterval(runTimer)
-    runTimer = null
-    ss = 0
-    mm = 0
-    hh = 0
-    showTime()
-})
+ copyBtn.addEventListener("click",()=>{
+     navigator.clipboard.writeText(result)
+ })
